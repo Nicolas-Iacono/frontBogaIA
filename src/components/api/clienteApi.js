@@ -32,34 +32,10 @@ clienteApi.interceptors.request.use(
 );
 
 export const getClientes = async (username) => {
-    const cacheKey = `clientes_${username}`;
-    const cachedItem = localStorage.getItem(cacheKey);
-
-    if (cachedItem) {
-        try {
-            const { timestamp, data } = JSON.parse(cachedItem);
-            if (Date.now() - timestamp < CACHE_DURATION_MS) {
-                console.log(`Returning cached clientes for user ${username} from ${cacheKey}`);
-                return data;
-            } else {
-                console.log(`Cache expired for ${cacheKey}`);
-                localStorage.removeItem(cacheKey);
-            }
-        } catch (e) {
-            console.error(`Error parsing cached data for ${cacheKey}:`, e);
-            localStorage.removeItem(cacheKey);
-        }
-    }
-
-    const path = `/clientes/usuario/${username}`;
+    const path = `/clientes/lista/usuario/${username}`;
     try {
         console.log(`Fetching fresh clientes for user ${username} from API (${path})`);
         const response = await clienteApi.get(path);
-        const dataToCache = {
-            timestamp: Date.now(),
-            data: response.data,
-        };
-        localStorage.setItem(cacheKey, JSON.stringify(dataToCache));
         return response.data;
     } catch (error) {
         let failedUrl = path;
@@ -78,3 +54,24 @@ export const getClientes = async (username) => {
 };
 
 export default getClientes; // Default export for convenience if only one main function
+
+
+export const createCliente = async (clienteData) => {
+    try {
+        const response = await clienteApi.post("/clientes", clienteData);
+        console.log("Cliente creado correctamente:", response.data);
+        return response.data;
+    } catch (error) {
+        let failedUrl = "/clientes";
+        if (error.config?.baseURL) {
+            try {
+                failedUrl = new URL("/clientes", error.config.baseURL).href;
+            } catch (e) {
+                const slash = (error.config.baseURL.endsWith('/') || "/clientes".startsWith('/')) ? '' : '/';
+                failedUrl = `${error.config.baseURL}${slash}/clientes`.replace(/([^:])\/\/+/g, '$1/');
+            }
+        }
+        console.error(`Error creando cliente en ${failedUrl}:`, error);
+        throw error;
+    }
+};

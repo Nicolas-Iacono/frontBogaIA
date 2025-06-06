@@ -12,7 +12,7 @@ import {
     Chip
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { getCasos } from '../api/casoApi'; // Import getCasos
+import { getCasosLista } from '../api/casoApi'; // Import getCasos
 import { useAuth } from '../context/AuthContext';
 import { format, parseISO } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -51,15 +51,20 @@ const getStatusChip = (estado) => {
 const CasesTable = ({ onAddNewCaseClick, onViewAllCasesClick }) => { // Accept onAddNewCaseClick as a prop
     const { user } = useAuth(); // user is an object e.g., { username: "luciaTrofa" }
     const [casos, setCasos] = useState([]);
-
+    const [page, setPage] = useState(0);
+    const [size, setSize] = useState(10);
+const [totalPages, setTotalPages] = useState(0);
     const navigateTo = useNavigate();
+
+    
     useEffect(() => {
         const traerInformacion = async () => {
             if (user && user.username) {
                 try {
                     console.log(`CasesTable: Fetching casos for ${user.username}`);
-                    const data = await getCasos(user.username); 
-                    setCasos(data);
+                    const data = await getCasosLista(user.username, page, size); 
+                    setCasos(data.content);
+                    setTotalPages(data.totalPages);
                 } catch (error) {
                     console.error("Error al traer la información:", error);
                 }
@@ -67,7 +72,7 @@ const CasesTable = ({ onAddNewCaseClick, onViewAllCasesClick }) => { // Accept o
         };
     
         traerInformacion();
-    }, [user]); // Depend on the user object from context
+    }, [user, page, size]); // Depend on the user object from context
     console.log(casos)
     return (
         <Paper sx={{ width: '100%', overflow: 'hidden', boxShadow: 'none', border: '1px solid #e0e0e0', borderRadius: '12px', backgroundColor: 'white' }}>
@@ -94,7 +99,7 @@ const CasesTable = ({ onAddNewCaseClick, onViewAllCasesClick }) => { // Accept o
                                 <TableCell component="th" scope="row" sx={{ fontWeight: 'medium', color: 'text.primary', pl: 2.5, fontSize: '0.875rem' }}>
                                     {row.titulo}
                                 </TableCell>
-                                <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.cliente.nombre + ' ' + row.cliente.apellido}</TableCell>
+                                <TableCell sx={{ color: 'text.secondary', fontSize: '0.875rem' }}>{row.nombreCliente + ' ' + row.apellidoCliente}</TableCell>
                                 <TableCell>{getStatusChip(row.estado)}</TableCell>
                                 <TableCell sx={{ color: 'text.secondary', pr: 2.5, fontSize: '0.875rem' }}>{row.fechaCreacion ? format(parseISO(row.fechaCreacion), 'yyyy-MM-dd') : ''}</TableCell>
                             </TableRow>

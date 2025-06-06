@@ -7,13 +7,14 @@ import Casos from "./components/pages/Casos";
 import CrearCliente from "./components/pages/CrearCliente";
 import CaseDetail from "./components/pages/CaseDetail";
 import { CrearCaso } from './components/pages/CrearCaso'; // Import CrearCaso page
+import DocumentosPage from './components/pages/Documentos'; // Import DocumentosPage
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import ChatIa from './components/common/ChatIa'; // Import the new ChatIa component // Import ProtectedRoute
 import './App.css';
 import Sidebar from "./components/layout/Sidebar"; // Changed Header to Sidebar
 import { AuthProvider } from "./components/context/AuthContext";
 import { Box, CssBaseline } from "@mui/material"; // Added CssBaseline for consistent styling
-import './index.css';
+
 const drawerWidth = 260; // Must match the drawerWidth in Sidebar.jsx
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
                             <Route path="/casos/:id" element={<ProtectedRoute><CaseDetail /></ProtectedRoute>} />
                             <Route path="/crear-caso" element={<ProtectedRoute><CrearCaso /></ProtectedRoute>} /> {/* Route for Crear Caso */}
                             <Route path="/crear-cliente" element={<ProtectedRoute><CrearCliente /></ProtectedRoute>} /> {/* Route for Crear Cliente */}
+                            <Route path="/documentos" element={<ProtectedRoute><DocumentosPage /></ProtectedRoute>} /> {/* Route for Documentos Page */}
                             {/* Add other routes here */}
                         </Routes>
                     </Box>

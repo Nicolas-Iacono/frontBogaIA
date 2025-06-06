@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Box, Typography, CircularProgress, Alert } from '@mui/material';
-import { getCasos } from '../api/casoApi';
+import { getCasosLista } from '../api/casoApi';
 import { AuthContext } from '../context/AuthContext';
 import CasosTable from '../common/CasosTable';
 
@@ -25,8 +25,8 @@ const Casos = () => {
           try {
             setIsLoading(true);
             setError(null);
-            const data = await getCasos(authUser.username);
-            setCasos(data || []);
+            const data = await getCasosLista(authUser.username, 0, 10);
+            setCasos(data.content || []);
           } catch (err) {
             setError(err.message || 'Error al cargar los casos.');
             setCasos([]);

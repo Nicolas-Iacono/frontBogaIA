@@ -1,75 +1,95 @@
-import { Box, Typography, Grid, CircularProgress, Alert } from "@mui/material"; // Added CircularProgress, Alert
+import { Box, Typography, Grid, CircularProgress, Alert, Button, Slide } from "@mui/material"; // Added Button, Slide
 import { useAuth } from "../context/AuthContext";
 import MiniCalendar from "../MiniCalendar";
-import { useEffect, useState } from "react"; // Added useEffect, useState
-import { getClientes } from "../api/clienteApi"; // Import getClientes
-import ClientCard from "../common/ClientCard"; // Import ClientCard
+import { useEffect, useState } from "react";
+import { getClientes } from "../api/clienteApi";
+// import ClientCard from "../common/ClientCard"; // No longer directly used here if ClientsTable handles individual cards
 import ClientsTable from "../common/ClientsTable";
+import ClienteForm from "../forms/ClienteForm"; // Import ClienteForm
 
 export const Clientes = () => {
-    const { user: authUser } = useAuth(); // Renamed to avoid conflict if 'user' is in client data
+    const { user: authUser } = useAuth();
     const [clientes, setClientes] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showClienteForm, setShowClienteForm] = useState(false); // State for form visibility
+
+    // Fetch clients
+    const fetchClientesData = async () => {
+        if (!authUser) {
+            setIsLoading(false);
+            return;
+        }
+        try {
+            setIsLoading(true);
+            setError(null);
+            const data = await getClientes(authUser.username);
+            setClientes(data || []);
+        } catch (err) {
+            console.error("Error fetching clientes:", err);
+            setError(err.message || "Error al cargar los clientes.");
+            setClientes([]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        if (authUser) { // Ensure authUser (username) is available
-            const fetchClientes = async () => {
-                try {
-                    setIsLoading(true);
-                    setError(null);
-                    const data = await getClientes(authUser.username); // Use username from auth context
-                    setClientes(data || []); // Ensure clientes is an array
-                } catch (err) {
-                    console.error("Error fetching clientes:", err);
-                    setError(err.message || "Error al cargar los clientes.");
-                    setClientes([]); // Clear clients on error
-                } finally {
-                    setIsLoading(false);
-                }
-            };
-            fetchClientes();
-        } else {
-            setIsLoading(false); // Not logged in, so not loading
-            // Optionally, set an error or message indicating user needs to log in
-        }
-    }, [authUser]); // Dependency array includes authUser
+        fetchClientesData();
+    }, [authUser]);
 
+    // Handler to show the client creation form
+    const handleShowClienteForm = () => {
+        setShowClienteForm(true);
+    };
+
+    // Handler for when the ClienteForm is submitted
+    const handleClienteFormSubmit = async (values) => {
+        console.log("ClienteForm submitted in Clientes page:", values);
+        // TODO: Implement API call to create client
+        // For example: await createClienteApiFunction(authUser.username, values);
+        // After successful submission, hide the form and refresh client list
+        setShowClienteForm(false);
+        fetchClientesData(); // Re-fetch client list
+    };
+
+    // Handler to cancel form display and show the table
+    const handleCancelClienteForm = () => {
+        setShowClienteForm(false);
+    };
+    
+    // Placeholder handlers for edit/delete, can be passed to ClientsTable if needed
     const handleEditClient = (clientId) => {
         console.log("Edit client:", clientId);
-        // Implement edit functionality (e.g., open a modal, navigate to an edit page)
+        // TODO: Navigate to edit form or open modal
     };
 
     const handleDeleteClient = (clientId) => {
         console.log("Delete client:", clientId);
-        // Implement delete functionality (e.g., show confirmation, call delete API)
-        // Potentially refresh client list:
-        // setClientes(prevClientes => prevClientes.filter(c => c.id !== clientId));
+        // TODO: Call delete API and then fetchClientesData()
     };
 
     return (
         <Box sx={{
             padding: 1,
-            height: "calc(100vh - 4rem)", // Adjust height to fill viewport below header
             width: "100%",
             backgroundColor: " #f5f5f5",
             overflowY: "auto",
             overflowX: "hidden",
-            height:"100%"
+            height:"100vh" // Ensure it takes full viewport height alongside sidebar
         }}>
             <Grid container spacing={0} sx={{ height: '100%' }}>
-                {/* First Column (approx 70%) */}
-                <Grid item xs={12} md={8} sx={{ padding: 2, display: 'flex', flexDirection: 'column', width: "70%" }}> {/* Removed height: '100%' to allow content to define height */}
+                {/* First Column */} 
+                <Grid item xs={12} md={8} sx={{ padding: 2, display: 'flex', flexDirection: 'column', width: "70%", position: 'relative' }}>
                     <Box sx={{
                         display: 'flex',
-                        width: "100%", // Adjusted to full width of the column
+                        width: "100%",
                         flexDirection: "column",
                         justifyContent: 'start',
                         alignItems: 'start',
                         padding: 1.5,
-                        mb: 2 // Added margin bottom
+                        mb: 2
                     }}>
-
                         <Typography variant="h5" gutterBottom sx={{ textTransform: 'none', fontWeight: 'bold', color: 'black', fontSize: '1.2rem' }}>
                             Gestión de Clientes
                         </Typography>
@@ -77,26 +97,25 @@ export const Clientes = () => {
                             Aquí podrás administrar tus clientes.
                         </Typography>
                     </Box>
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: "column",
-                        justifyContent: 'start', // Changed from space-around
-                        alignItems: 'start',
-                        padding: 1,
-                        marginTop: "2rem",
-                        height: "100%"
-                    }}>
-                        <Typography variant="h6" sx={{ textTransform: 'none', fontWeight: 'bold', color: 'black', fontSize: '1.2rem', marginBottom: 2 }}>
-                            Listado de Clientes
-                        </Typography>
+
+                    {/* This Box now directly contains the table header and table */}
+                    <Box sx={{width: '100%'}}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, width: '100%' }}>
+                            <Typography variant="h6" sx={{ textTransform: 'none', fontWeight: 'bold', color: 'black', fontSize: '1.2rem' }}>
+                                Listado de Clientes
+                            </Typography>
+                            <Button variant="contained" sx={{backgroundColor:"rgb(37, 37, 88)"}} onClick={handleShowClienteForm}>
+                                Crear Nuevo Cliente
+                            </Button>
+                        </Box>
                         <Box sx={{
-                            width: '100%', // Ensure this box takes full width
-                            flexGrow: 1, // Allow this box to grow and fill available space
-                            overflowY: 'auto', // Allow scrolling for client cards if they overflow
-                            paddingRight: 1, // Add some padding to prevent scrollbar overlap
+                            width: '100%',
+                            flexGrow: 1,
+                            overflowY: 'auto',
+                            paddingRight: 1, // For scrollbar spacing
                         }}>
                             {isLoading && (
-                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
                                     <CircularProgress />
                                 </Box>
                             )}
@@ -105,32 +124,42 @@ export const Clientes = () => {
                             )}
                             {!isLoading && !error && clientes.length === 0 && (
                                 <Typography variant="body1" sx={{ textAlign: 'center', color: 'text.secondary', mt: 4 }}>
-                                    No hay clientes para mostrar.
+                                    No hay clientes para mostrar. Click en "Crear Nuevo Cliente" para empezar.
                                 </Typography>
                             )}
                             {!isLoading && !error && clientes.length > 0 && (
                                 <ClientsTable
-                                    clientes={clientes} // Pass the full list of clientes once
+                                    clientes={clientes}
+                                    onEditClient={handleEditClient} 
+                                    onDeleteClient={handleDeleteClient}
                                 />
                             )}
                         </Box>
                     </Box>
+
+                    {/* Floating Form using Slide */}
+                    <Slide direction="left" in={showClienteForm} mountOnEnter unmountOnExit>
+                        <Box sx={{
+                            position: 'absolute',
+                            top: 40, // Aligns vertically with the "Listado de Clientes" title row
+                            right: -300, // Positioned with padding from the right edge
+                            width: { xs: 'calc(100% - 32px)', sm: '400px', md: '300px' }, // Responsive width
+                            maxHeight: 'calc(100% - 116px)', // Max height considering top offset and parent bottom padding
+                            overflowY: 'auto', // Enable scroll if form content is tall
+                            padding: 3,
+                            backgroundColor: 'white',
+                            boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.12)',
+                            zIndex: 1200, 
+                            borderRadius: '12px',
+                            border: '1px solid #e0e0e0'
+                        }}>
+                            <ClienteForm onSubmitForm={handleClienteFormSubmit} onCancel={handleCancelClienteForm} />
+                        </Box>
+                    </Slide>
                 </Grid>
 
                 {/* Second Column (Calendar and other sidebar items) */}
-                <Grid item xs={12} md={4} sx={{
-                    padding: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2,
-                    width: "30%"
-                }}>
-                    <Typography variant="h6" gutterBottom sx={{ textTransform: 'none', fontWeight: 'bold', color: 'black', fontSize: '1.2rem' }}>
-                        Calendario
-                    </Typography>
-                    <MiniCalendar />
-                    {/* You can add more client-specific sidebar items here */}
-                </Grid>
+        
             </Grid>
         </Box>
     );

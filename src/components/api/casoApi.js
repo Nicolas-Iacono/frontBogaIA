@@ -32,7 +32,6 @@ casoApi.interceptors.request.use(
     }
 );
 
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes cache duration
 
 export const crearCaso = async (casoData) => {
     try {
@@ -51,33 +50,11 @@ export const crearCaso = async (casoData) => {
 };
 
 export const getCasos = async (username) => {
-    const cacheKey = `casos_${username}`;
-    const cachedItem = localStorage.getItem(cacheKey);
-
-    if (cachedItem) {
-        try {
-            const { timestamp, data } = JSON.parse(cachedItem);
-            if (Date.now() - timestamp < CACHE_DURATION_MS) {
-                console.log(`Returning cached casos for user ${username} from ${cacheKey}`);
-                return data;
-            } else {
-                console.log(`Cache expired for ${cacheKey}`);
-                localStorage.removeItem(cacheKey); // Remove stale data
-            }
-        } catch (e) {
-            console.error(`Error parsing cached data for ${cacheKey}:`, e);
-            localStorage.removeItem(cacheKey); // Remove corrupted data
-        }
-    }
+    console.warn("⚠️ Llamando a getCasos() → endpoint viejo");
     const path = `/caso/usuario/${username}`;
     try {
         console.log(`Fetching fresh casos for user ${username} from API (${path})`);
         const response = await casoApi.get(path);
-        const dataToCache = {
-            timestamp: Date.now(),
-            data: response.data,
-        };
-        localStorage.setItem(cacheKey, JSON.stringify(dataToCache));
         return response.data;
     } catch (error) {
         let failedUrl = path;
@@ -104,3 +81,26 @@ export const getCasos = async (username) => {
     }
 };
 export default getCasos;
+
+
+export const getCasosLista = async (username, page = 0, size = 10, search = '') => {
+    const params = new URLSearchParams({
+        page,
+        size,
+    });
+
+    if (search && search.trim() !== '') {
+        params.append('search', search);
+    }
+
+    const path = `/caso/usuario/lista/page/${username}?${params.toString()}`;
+
+    try {
+        console.log(`Fetching paginated casos for user ${username} with search='${search}' from API (${path})`);
+        const response = await casoApi.get(path);
+        return response.data; 
+    } catch (error) {
+        console.error(`Error fetching casos for user ${username} from ${path}:`, error);
+        throw error;
+    }
+};

@@ -1,11 +1,11 @@
 
-import FormTailClient from "../common/tailwindComponents/FormTailClient";
+import ClienteForm from "../forms/ClienteForm";
 
 
 const CrearCliente = () => {
     return (
         <div>
-            <FormTailClient />
+            <ClienteForm />
         </div>
     );
 };

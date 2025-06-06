@@ -34,6 +34,7 @@ import DocumentsIcon from '@mui/icons-material/ArticleOutlined';
 import BillingIcon from '@mui/icons-material/ReceiptOutlined';
 import ReportsIcon from '@mui/icons-material/AssessmentOutlined';
 import { Collapse } from '@mui/material';
+import AppLogo from '../../assets/boga-logo.svg'; // <<< PLEASE REPLACE with your actual logo path and filename
 
 const standardDrawerWidth = 260;
 const authPageDrawerWidth = '50vw';
@@ -84,7 +85,7 @@ export default function Sidebar() {
                 '& .MuiDrawer-paper': {
                     width: currentDrawerWidth,
                     boxSizing: 'border-box',
-                    backgroundColor: '#1E1E2D',
+                    backgroundColor: ' #1E1E2D',
                     color: '#A2A3B7',
                     borderRight: '1px solid #2A2A3F',
                     overflowX: 'hidden',
@@ -96,21 +97,55 @@ export default function Sidebar() {
             }}
         >
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2, backgroundColor: '#161622' }}>
+                <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2, backgroundColor: ' #161622' }}>
+                <img 
+                            src={AppLogo} 
+                            alt="BogaDoctor AI Logo" 
+                            style={{ 
+                                maxWidth: '30%',      // Adjust percentage for desired width relative to sidebar
+                                maxHeight: '50px',   // Adjust pixel value for desired max height
+                                objectFit: 'contain', // Ensures the logo scales nicely without distortion
+                                filter:'invert(60%)'
+                            }} 
+                        />
                     <Typography
                         variant="h5"
                         component={RouterLink}
                         to="/"
                         sx={{
-                            color: "#FFFFFF",
+                            color: " #FFFFFF",
                             textDecoration: 'none',
                             fontWeight: 'bold',
                         }}
                     >
-                        BogaDoctor AI
+                        BogaDoctor
                     </Typography>
                 </Toolbar>
-                <Divider sx={{ borderColor: '#2A2A3F' }} />
+                <Divider sx={{ borderColor: ' #2A2A3F' }} />
+
+                {/* Logo display for Auth Page */}
+                {isOnAuthPage && !isAuthenticated && (
+                    <Box
+                        sx={{
+                            flexGrow: 1, // Takes up available vertical space
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            p: 3, // Padding around the logo
+                        }}
+                    >
+                        <img 
+                            src={AppLogo} 
+                            alt="BogaDoctor AI Logo" 
+                            style={{ 
+                                maxWidth: '60%',      // Adjust percentage for desired width relative to sidebar
+                                maxHeight: '250px',   // Adjust pixel value for desired max height
+                                objectFit: 'contain', // Ensures the logo scales nicely without distortion
+                                filter:'invert(60%)'
+                            }} 
+                        />
+                    </Box>
+                )}
 
                 <Collapse in={showNavItems} timeout="auto" unmountOnExit sx={{ width: '100%', display: 'flex', flexDirection: 'column', flexGrow: 1}}>
                     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}>
@@ -127,7 +162,7 @@ export default function Sidebar() {
                                         borderRadius: '8px',
                                         mb: 0.5,
                                         '&:hover': {
-                                            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                                            backgroundColor: 'rgba(3, 31, 239, 0.05)',
                                         },
                                     }}
                                 >
@@ -149,13 +184,13 @@ export default function Sidebar() {
                                     mb: 2,
                                     '& .MuiOutlinedInput-root': {
                                         borderRadius: '8px',
-                                        backgroundColor: '#2A2A3F',
-                                        color: '#A2A3B7',
+                                        backgroundColor: ' #2A2A3F',
+                                        color: ' #A2A3B7',
                                         '& fieldset': {
                                             borderColor: 'transparent',
                                         },
                                         '&:hover fieldset': {
-                                            borderColor: '#4A4A6A',
+                                            borderColor: ' #4A4A6A',
                                         },
                                         '&.Mui-focused fieldset': {
                                             borderColor: '#7B7B9E',
@@ -166,7 +201,7 @@ export default function Sidebar() {
                                         },
                                     },
                                     '& .MuiSvgIcon-root': {
-                                        color: '#6E6E86'
+                                        color: ' #6E6E86'
                                     }
                                 }}
                                 InputProps={{
@@ -196,8 +231,8 @@ export default function Sidebar() {
                                 MenuListProps={{ 'aria-labelledby': 'user-menu-button' }}
                                 PaperProps={{
                                     sx: {
-                                        backgroundColor: '#2A2A3F',
-                                        color: '#A2A3B7',
+                                        backgroundColor: ' #2A2A3F',
+                                        color: ' #A2A3B7',
                                         mt: 1,
                                         minWidth: 180,
                                     }
@@ -206,7 +241,7 @@ export default function Sidebar() {
                                 anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
                             >
                                 <MenuItem onClick={() => { navigate('/profile'); handleMenuClose(); }} sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.05)' } }}>Profile</MenuItem>
-                                <MenuItem onClick={handleLogout} sx={{ '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.05)' } }}>Logout</MenuItem>
+                                <MenuItem onClick={handleLogout} sx={{ '&:hover': { backgroundColor: 'rgba(29, 37, 107, 0.05)' } }}>Logout</MenuItem>
                             </Menu>
                         </Box>
                     </Box>

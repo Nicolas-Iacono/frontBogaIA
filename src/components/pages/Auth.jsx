@@ -35,12 +35,14 @@ const AuthPage = () => {
         display: 'flex',
         flexDirection: 'row', // Side-by-side columns
         height: '100vh',
-        width: '100vw',
+        width: '100%',
         margin: 0,
         padding: 0, // No padding on the outermost container
         paddingTop: '64px', // Assuming 64px fixed header; adjust if necessary
         backgroundColor: theme.palette.grey[50], // Light grey background for the page
         overflow: 'hidden', // Prevent scrollbars on the container itself
+        justifyContent: 'center',
+        alignItems: 'center',
       }}
     >
       {/* Form Column */} 
@@ -50,8 +52,8 @@ const AuthPage = () => {
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center', // Center form vertically if space allows
-          width: { xs: '100%', md: '700px' }, // Full width on xs, auto on md based on maxWidth
-          maxWidth: { xs: '100%', md: '500px' }, // Max width for the form section
+          width: { xs: '100%', md: '500px' }, // Full width on xs, auto on md based on maxWidth
+          maxWidth: { xs: '100%', md: '700px' }, // Max width for the form section
           p: { xs: 2, sm: 4 },
           height: '100%', // Take full available height within the padded container
           maxHeight: 'calc(100vh - 64px)', // Ensure it fits below header

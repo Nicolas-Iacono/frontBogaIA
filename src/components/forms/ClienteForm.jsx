@@ -5,17 +5,24 @@ import {
     Button,
     Typography,
     Grid,
-    Paper
+    Paper,
+    IconButton,
 } from '@mui/material';
-
-export default function ClienteForm() {
+import { useAuth } from '../context/AuthContext';
+import { createCliente } from '../api/clienteApi';
+import ArrowForwardIosRoundedIcon from '@mui/icons-material/ArrowForwardIosRounded';
+export default function ClienteForm({ onSubmitForm, onCancel }){
+    const { user } = useAuth();
+    const name = user.username
+    console.log(name)
+console.log(user);
     const [formData, setFormData] = useState({
         nombre: '',
         apellido: '',
         telefono: '',
         email: '',
         dni: '',
-        usuarioId: '' // Or a default/derived value
+        username: name
     });
 
     const handleChange = (event) => {
@@ -26,48 +33,71 @@ export default function ClienteForm() {
         }));
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        // Basic validation example (can be expanded)
         if (!formData.nombre || !formData.apellido || !formData.email) {
             alert('Por favor, complete los campos obligatorios: Nombre, Apellido, Email.');
             return;
         }
+    
         const clientJson = {
             nombre: formData.nombre,
             apellido: formData.apellido,
             telefono: formData.telefono,
             email: formData.email,
             dni: formData.dni,
-            usuarioId: parseInt(formData.usuarioId, 10) || null // Ensure usuarioId is a number or null
+            username: name
         };
-        console.log('Datos del Cliente (JSON):', JSON.stringify(clientJson, null, 2));
-        alert('Datos del cliente enviados. Revisa la consola.');
-        // Here you would typically send the data to a backend API
-        // Example: apiClient.post('/clientes', clientJson);
-
-        // Optionally, reset form after submission
-        setFormData({
-            nombre: '',
-            apellido: '',
-            telefono: '',
-            email: '',
-            dni: '',
-            usuarioId: ''
-        });
-    };
+    
+        try {
+            const createdCliente = await createCliente(clientJson);
+            console.log("Cliente creado:", createdCliente);
+    
+            if (onSubmitForm) {
+                onSubmitForm(createdCliente); // opcional: notificar al padre
+            }
+    
+            // limpiar formulario
+            setFormData({
+                nombre: '',
+                apellido: '',
+                telefono: '',
+                email: '',
+                dni: '',
+                username: name
+            });
+    
+        } catch (error) {
+            console.error("Error al crear cliente:", error);
+            alert("Ocurrió un error al crear el cliente. Revisá la consola.");
+        }
+    };     
 
     return (
-        <Paper elevation={3} sx={{ p: 4, maxWidth: 600, margin: 'auto', mt: 4 }}>
-            <Typography variant="h5" component="h1" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
-                Registrar Nuevo Cliente
-            </Typography>
+        <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h5" component="h1" gutterBottom sx={{ textAlign: 'start' }}>
+                    Nuevo Cliente
+                </Typography>
+                <IconButton onClick={onCancel} color="inherit" variant="outlined">
+                    <ArrowForwardIosRoundedIcon />
+                </IconButton>
+            </Box>
+
             <Box component="form" onSubmit={handleSubmit} noValidate>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
+                <Grid container spacing={2} sx={{display:"flex", flexDirection:"column"}}>
                         <TextField
-                            required
-                            fullWidth
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  borderRadius: 2,
+                                  height:"2.5rem",
+                                  fontSize:"1rem",
+                                  fontWeight: "medium",
+                                  display:"flex",
+                                  alignItems:"center",
+                                  justifyContent:"center"
+                                },
+                              }}
                             id="nombre"
                             label="Nombre"
                             name="nombre"
@@ -75,32 +105,56 @@ export default function ClienteForm() {
                             onChange={handleChange}
                             autoFocus
                         />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
                         <TextField
-                            required
-                            fullWidth
+                        
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                              borderRadius: 2,
+                              height:"2.5rem",
+                              fontSize:"1rem",
+                              fontWeight: "medium",
+                              display:"flex",
+                              alignItems:"center",
+                              justifyContent:"center"
+                            },
+                          }}
                             id="apellido"
                             label="Apellido"
                             name="apellido"
                             value={formData.apellido}
                             onChange={handleChange}
                         />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
+                   
+                        <TextField 
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  borderRadius: 2,
+                                  height:"2.5rem",
+                                  fontSize:"1rem",
+                                  fontWeight: "medium",
+                                  display:"flex",
+                                  alignItems:"center",
+                                  justifyContent:"center"
+                                },
+                              }}
                             id="telefono"
                             label="Teléfono"
                             name="telefono"
                             value={formData.telefono}
                             onChange={handleChange}
                         />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            required
-                            fullWidth
+                        <TextField 
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  borderRadius: 2,
+                                  height:"2.5rem",
+                                  fontSize:"1rem",
+                                  fontWeight: "medium",
+                                  display:"flex",
+                                  alignItems:"center",
+                                  justifyContent:"center"
+                                },
+                              }}
                             id="email"
                             label="Email"
                             name="email"
@@ -108,41 +162,56 @@ export default function ClienteForm() {
                             value={formData.email}
                             onChange={handleChange}
                         />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
+                        <TextField 
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  borderRadius: 2,
+                                  height:"2.5rem",
+                                  fontSize:"1rem",
+                                  fontWeight: "medium",
+                                  display:"flex",
+                                  alignItems:"center",
+                                  justifyContent:"center"
+                                },
+                              }}
                             id="dni"
-                            label="DNI"
+                            label="Doc. de Identidad"
                             name="dni"
                             value={formData.dni}
                             onChange={handleChange}
                         />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <TextField
-                            fullWidth
-                            id="usuarioId"
-                            label="Usuario ID (Asignado)"
-                            name="usuarioId"
-                            type="number"
-                            value={formData.usuarioId}
-                            onChange={handleChange}
-                            // Consider making this read-only or pre-filled if it's system-assigned
-                        />
-                    </Grid>
                     <Grid item xs={12}>
-                        <Button
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3, gap: 1 ,flexDirection:"column"}}>
+                   
+                               <Button
+                         sx={{
+                      
+                            mb: 2,
+                            backgroundColor: 'rgb(44, 38, 80)',
+                            borderRadius: 2.5,
+                            height: '2rem',
+                            fontSize: '1rem',
+                            fontWeight: '500', // 'medium' no es válido, usá números o palabras como 'bold'
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '&:hover': {
+                              backgroundColor: 'rgb(29, 25, 49)', // o cualquier color que prefieras al hacer hover
+                            },
+                          }}
                             type="submit"
                             fullWidth
                             variant="contained"
-                            sx={{ mt: 3, mb: 2 }}
+
                         >
                             Registrar Cliente
                         </Button>
+                        </Box>
+                    
                     </Grid>
                 </Grid>
             </Box>
-        </Paper>
+        </Box>
     );
 }
